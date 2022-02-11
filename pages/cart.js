@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import dynamic from 'next/dynamic';
-import dynamic from 'next/dynamic';
 import Layout from '../components/Layout';
 import { Store } from '../utils/Store';
 import NextLink from 'next/link';
@@ -31,20 +30,25 @@ function CartScreen() {
   const {
     cart: { cartItems },
   } = state;
+
   const updateCartHandler = async (item, quantity) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
+
     if (data.countInStock < quantity) {
       window.alert('Sorry. Product is out of stock');
       return;
     }
     dispatch({ type: 'CART_ADD_ITEM', payload: { ...item, quantity } });
   };
+
   const removeItemHandler = (item) => {
     dispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
+
   const checkoutHandler = () => {
     router.push('/shipping');
   };
+
   return (
     <Layout title="Shopping Cart">
       <Typography component="h1" variant="h1">
