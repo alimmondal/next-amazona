@@ -48,9 +48,9 @@ function PlaceOrder() {
   useEffect(() => {
     if (!paymentMethod) {
       router.push('/payment');
-      if (cartItems.length === 0) {
-        router.push('/cart');
-      }
+    }
+    if (cartItems.length === 0) {
+      router.push('/cart');
     }
   }, []);
   const { closeSnackbar, enqueueSnackbar } = useSnackbar();
@@ -87,10 +87,10 @@ function PlaceOrder() {
   };
 
   return (
-    <Layout title="PlaceOrder">
+    <Layout title="Place Order">
       <CheckoutWizard activeStep={3}></CheckoutWizard>
       <Typography component="h1" variant="h1">
-        PlaceOrder
+        Place Order
       </Typography>
       <Grid container spacing={1}>
         <Grid item md={9} xs={12}>
