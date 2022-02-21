@@ -21,7 +21,6 @@ import {
 } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import useStyles from '../../utils/styles';
-import CheckoutWizard from '../../components/CheckoutWizard';
 import { getError } from '../../utils/error';
 import axios from 'axios';
 import { useReducer } from 'react';
@@ -35,6 +34,14 @@ function reducer(state, action) {
       return { ...state, loading: false, order: action.payload, error: '' };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
+    case 'PAY_REQUEST':
+      return { ...state, loadingPay: true };
+    case 'PAY_SUCCESS':
+      return { ...state, loadingPay: false, successPay: true };
+    case 'PAY_FAIL':
+      return { ...state, loadingPay: false, errorPay: action.payload };
+    case 'PAY_RESET':
+      return { ...state, loadingPay: false, successPay: false, errorPay: '' };
     default:
       state;
   }
@@ -47,11 +54,14 @@ function Order({ params }) {
   const router = useRouter();
   const { state } = useContext(Store);
   const { userInfo } = state;
-  const [{ loading, error, order }, dispatch] = useReducer(reducer, {
-    loading: true,
-    order: {},
-    error: '',
-  });
+  const [{ loading, error, order, successPay }, dispatch] = useReducer(
+    reducer,
+    {
+      loading: true,
+      order: {},
+      error: '',
+    }
+  );
   const {
     shippingAddress,
     paymentMethod,
@@ -81,8 +91,11 @@ function Order({ params }) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
-    if (!order._id || (order._id && order._id !== orderId)) {
+    if (!order._id || successPay || (order._id && order._id !== orderId)) {
       fetchOrder();
+      if (successPay) {
+        dispatch({ type: 'PAY_RESET' });
+      }
     } else {
       const loadPaypalScript = async () => {
         const { data: clientId } = await axios.get('/api/keys/paypal', {
@@ -99,7 +112,7 @@ function Order({ params }) {
       };
       loadPaypalScript();
     }
-  }, [order]);
+  }, [order, successPay]);
 
   function createOrder(data, actions) {
     return actions.order
@@ -141,7 +154,6 @@ function Order({ params }) {
 
   return (
     <Layout title={`Order ${orderId}`}>
-      <CheckoutWizard activeStep={3}></CheckoutWizard>
       <Typography component="h1" variant="h1">
         {`Order ${orderId}`}
       </Typography>
@@ -295,11 +307,13 @@ function Order({ params }) {
                     {isPending ? (
                       <CircularProgress />
                     ) : (
-                      <PayPalButtons
-                        createOrder={createOrder}
-                        onApprove={onApprove}
-                        onError={onError}
-                      ></PayPalButtons>
+                      <div className={classes.fullWidth}>
+                        <PayPalButtons
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={onError}
+                        ></PayPalButtons>
+                      </div>
                     )}
                   </ListItem>
                 )}
