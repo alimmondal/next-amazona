@@ -18,9 +18,11 @@ import {
   List,
   ListItem,
   CircularProgress,
+  Button,
 } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import useStyles from '../../utils/styles';
+import { enqueueSnackbar } from 'notistack';
 import { getError } from '../../utils/error';
 import axios from 'axios';
 import { useReducer } from 'react';
@@ -42,6 +44,19 @@ function reducer(state, action) {
       return { ...state, loadingPay: false, errorPay: action.payload };
     case 'PAY_RESET':
       return { ...state, loadingPay: false, successPay: false, errorPay: '' };
+    case 'DELIVER_REQUEST':
+      return { ...state, loadingDeliver: true };
+    case 'DELIVER_SUCCESS':
+      return { ...state, loadingDeliver: false, successDeliver: true };
+    case 'DELIVER_FAIL':
+      return { ...state, loadingDeliver: false, errorDeliver: action.payload };
+    case 'DELIVER_RESET':
+      return {
+        ...state,
+        loadingDeliver: false,
+        successDeliver: false,
+        errorDeliver: '',
+      };
     default:
       state;
   }
@@ -54,14 +69,14 @@ function Order({ params }) {
   const router = useRouter();
   const { state } = useContext(Store);
   const { userInfo } = state;
-  const [{ loading, error, order, successPay }, dispatch] = useReducer(
-    reducer,
-    {
-      loading: true,
-      order: {},
-      error: '',
-    }
-  );
+  const [
+    { loading, error, order, successPay, loadingDeliver, successDeliver },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    order: {},
+    error: '',
+  });
   const {
     shippingAddress,
     paymentMethod,
@@ -93,10 +108,18 @@ function Order({ params }) {
       }
     };
 
-    if (!order._id || successPay || (order._id && order._id !== orderId)) {
+    if (
+      !order._id ||
+      successPay ||
+      successDeliver ||
+      (order._id && order._id !== orderId)
+    ) {
       fetchOrder();
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
+      }
+      if (successDeliver) {
+        dispatch({ type: 'DELIVER_RESET' });
       }
     } else {
       const loadPaypalScript = async () => {
@@ -114,7 +137,7 @@ function Order({ params }) {
       };
       loadPaypalScript();
     }
-  }, [order, successPay]);
+  }, [order, successPay, successDeliver]);
 
   function createOrder(data, actions) {
     return actions.order
@@ -152,6 +175,24 @@ function Order({ params }) {
 
   function onError(err) {
     enqueueSnackbar(getError(err), { variant: 'error' });
+  }
+
+  async function deliverOrderHandler() {
+    try {
+      dispatch({ type: 'DELIVER_REQUEST' });
+      const { data } = await axios.put(
+        `/api/orders/${order._id}/deliver`,
+        {},
+        {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      dispatch({ type: 'DELIVER_SUCCESS', payload: data });
+      enqueueSnackbar('Order is delivered', { variant: 'success' });
+    } catch (err) {
+      dispatch({ type: 'DELIVER_FAIL', payload: getError(err) });
+      enqueueSnackbar(getError(err), { variant: 'error' });
+    }
   }
 
   return (
@@ -317,6 +358,19 @@ function Order({ params }) {
                         ></PayPalButtons>
                       </div>
                     )}
+                  </ListItem>
+                )}
+                {userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                  <ListItem>
+                    {loadingDeliver && <CircularProgress />}
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      onClick={deliverOrderHandler}
+                    >
+                      Deliver Order
+                    </Button>
                   </ListItem>
                 )}
               </List>
