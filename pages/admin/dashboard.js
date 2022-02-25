@@ -81,14 +81,19 @@ function AdminDashboard() {
                   <ListItemText primary="Admin Dashboard"></ListItemText>
                 </ListItem>
               </NextLink>
+              <NextLink href="/admin/orders" passHref>
+                <ListItem button component="a">
+                  <ListItemText primary="Orders"></ListItemText>
+                </ListItem>
+              </NextLink>
               <NextLink href="/admin/products" passHref>
                 <ListItem button component="a">
                   <ListItemText primary="Products"></ListItemText>
                 </ListItem>
               </NextLink>
-              <NextLink href="/admin/orders" passHref>
+              <NextLink href="/admin/users" passHref>
                 <ListItem button component="a">
-                  <ListItemText primary="Orders"></ListItemText>
+                  <ListItemText primary="Users"></ListItemText>
                 </ListItem>
               </NextLink>
             </List>
