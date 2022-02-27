@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import dynamic from 'next/dynamic';
 import Layout from '../../components/Layout';
 import { Store } from '../../utils/Store';
@@ -14,18 +14,17 @@ import {
   TableRow,
   TableCell,
   Link,
+  CircularProgress,
+  Button,
   Card,
   List,
   ListItem,
-  CircularProgress,
-  Button,
 } from '@material-ui/core';
+import axios from 'axios';
 import { useRouter } from 'next/router';
 import useStyles from '../../utils/styles';
-import { enqueueSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 import { getError } from '../../utils/error';
-import axios from 'axios';
-import { useReducer } from 'react';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 
 function reducer(state, action) {
@@ -69,6 +68,7 @@ function Order({ params }) {
   const router = useRouter();
   const { state } = useContext(Store);
   const { userInfo } = state;
+
   const [
     { loading, error, order, successPay, loadingDeliver, successDeliver },
     dispatch,
@@ -86,8 +86,8 @@ function Order({ params }) {
     shippingPrice,
     totalPrice,
     isPaid,
-    isDelivered,
     paidAt,
+    isDelivered,
     deliveredAt,
   } = order;
 
@@ -95,7 +95,6 @@ function Order({ params }) {
     if (!userInfo) {
       return router.push('/login');
     }
-
     const fetchOrder = async () => {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
@@ -107,7 +106,6 @@ function Order({ params }) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
-
     if (
       !order._id ||
       successPay ||
@@ -127,7 +125,7 @@ function Order({ params }) {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
         paypalDispatch({
-          type: 'resetOption',
+          type: 'resetOptions',
           value: {
             'client-id': clientId,
             currency: 'USD',
@@ -138,6 +136,7 @@ function Order({ params }) {
       loadPaypalScript();
     }
   }, [order, successPay, successDeliver]);
+  const { enqueueSnackbar } = useSnackbar();
 
   function createOrder(data, actions) {
     return actions.order
@@ -152,7 +151,6 @@ function Order({ params }) {
         return orderID;
       });
   }
-
   function onApprove(data, actions) {
     return actions.order.capture().then(async function (details) {
       try {
@@ -198,7 +196,7 @@ function Order({ params }) {
   return (
     <Layout title={`Order ${orderId}`}>
       <Typography component="h1" variant="h1">
-        {`Order ${orderId}`}
+        Order {orderId}
       </Typography>
       {loading ? (
         <CircularProgress />
@@ -218,6 +216,16 @@ function Order({ params }) {
                   {shippingAddress.fullName}, {shippingAddress.address},{' '}
                   {shippingAddress.city}, {shippingAddress.postalCode},{' '}
                   {shippingAddress.country}
+                  &nbsp;
+                  {shippingAddress.location && (
+                    <Link
+                      variant="button"
+                      target="_new"
+                      href={`https://maps.google.com?q=${shippingAddress.location.lat},${shippingAddress.location.lng}`}
+                    >
+                      Show On Map
+                    </Link>
+                  )}
                 </ListItem>
                 <ListItem>
                   Status:{' '}
@@ -273,6 +281,7 @@ function Order({ params }) {
                                 </Link>
                               </NextLink>
                             </TableCell>
+
                             <TableCell>
                               <NextLink href={`/product/${item.slug}`} passHref>
                                 <Link>
@@ -304,7 +313,7 @@ function Order({ params }) {
                 <ListItem>
                   <Grid container>
                     <Grid item xs={6}>
-                      <Typography>Items: </Typography>
+                      <Typography>Items:</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography align="right">$ {itemsPrice}</Typography>
@@ -314,7 +323,7 @@ function Order({ params }) {
                 <ListItem>
                   <Grid container>
                     <Grid item xs={6}>
-                      <Typography>Tax: </Typography>
+                      <Typography>Tax:</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography align="right">$ {taxPrice}</Typography>
@@ -324,7 +333,7 @@ function Order({ params }) {
                 <ListItem>
                   <Grid container>
                     <Grid item xs={6}>
-                      <Typography>Shipping: </Typography>
+                      <Typography>Shipping:</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography align="right">$ {shippingPrice}</Typography>
