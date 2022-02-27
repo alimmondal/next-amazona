@@ -151,7 +151,7 @@ function Order({ params }) {
         return orderID;
       });
   }
-  function onApprove(actions) {
+  function onApprove(data, actions) {
     return actions.order.capture().then(async function (details) {
       try {
         dispatch({ type: 'PAY_REQUEST' });
