@@ -8,7 +8,8 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import CancelIcon from '@material-ui/icons/Cancel';
+import CancelIcon from '@mui/icons-material/Cancel';
+// import CancelIcon from '@material-ui/icons/Cancel';
 import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
 import Layout from '../components/Layout';
