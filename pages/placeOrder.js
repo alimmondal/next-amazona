@@ -14,30 +14,28 @@ import {
   TableRow,
   TableCell,
   Link,
+  CircularProgress,
   Button,
   Card,
   List,
   ListItem,
-  CircularProgress,
-} from '@material-ui/core';
+} from '@mui/material';
+import classes from '../utils/classes';
+import axios from 'axios';
 import { useRouter } from 'next/router';
-import useStyles from '../utils/styles';
 import CheckoutWizard from '../components/CheckoutWizard';
 import { useSnackbar } from 'notistack';
 import { getError } from '../utils/error';
 import Cookies from 'js-cookie';
-import axios from 'axios';
 
 function PlaceOrder() {
-  const classes = useStyles();
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const {
     userInfo,
     cart: { cartItems, shippingAddress, paymentMethod },
   } = state;
-
-  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
+  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100; // 123.456 => 123.46
   const itemsPrice = round2(
     cartItems.reduce((a, c) => a + c.price * c.quantity, 0)
   );
@@ -85,16 +83,16 @@ function PlaceOrder() {
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
-
   return (
     <Layout title="Place Order">
       <CheckoutWizard activeStep={3}></CheckoutWizard>
       <Typography component="h1" variant="h1">
         Place Order
       </Typography>
+
       <Grid container spacing={1}>
         <Grid item md={9} xs={12}>
-          <Card className={classes.section}>
+          <Card sx={classes.section}>
             <List>
               <ListItem>
                 <Typography component="h2" variant="h2">
@@ -108,7 +106,7 @@ function PlaceOrder() {
               </ListItem>
             </List>
           </Card>
-          <Card className={classes.section}>
+          <Card sx={classes.section}>
             <List>
               <ListItem>
                 <Typography component="h2" variant="h2">
@@ -118,7 +116,7 @@ function PlaceOrder() {
               <ListItem>{paymentMethod}</ListItem>
             </List>
           </Card>
-          <Card className={classes.section}>
+          <Card sx={classes.section}>
             <List>
               <ListItem>
                 <Typography component="h2" variant="h2">
@@ -151,6 +149,7 @@ function PlaceOrder() {
                               </Link>
                             </NextLink>
                           </TableCell>
+
                           <TableCell>
                             <NextLink href={`/product/${item.slug}`} passHref>
                               <Link>
@@ -162,7 +161,7 @@ function PlaceOrder() {
                             <Typography>{item.quantity}</Typography>
                           </TableCell>
                           <TableCell align="right">
-                            <Typography>$ {item.price}</Typography>
+                            <Typography>${item.price}</Typography>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -174,7 +173,7 @@ function PlaceOrder() {
           </Card>
         </Grid>
         <Grid item md={3} xs={12}>
-          <Card className={classes.section}>
+          <Card sx={classes.section}>
             <List>
               <ListItem>
                 <Typography variant="h2">Order Summary</Typography>
@@ -182,30 +181,30 @@ function PlaceOrder() {
               <ListItem>
                 <Grid container>
                   <Grid item xs={6}>
-                    <Typography>Items: </Typography>
+                    <Typography>Items:</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography align="right">$ {itemsPrice}</Typography>
-                  </Grid>
-                </Grid>
-              </ListItem>
-              <ListItem>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <Typography>Tax: </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography align="right">$ {taxPrice}</Typography>
+                    <Typography align="right">${itemsPrice}</Typography>
                   </Grid>
                 </Grid>
               </ListItem>
               <ListItem>
                 <Grid container>
                   <Grid item xs={6}>
-                    <Typography>Shipping: </Typography>
+                    <Typography>Tax:</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography align="right">$ {shippingPrice}</Typography>
+                    <Typography align="right">${taxPrice}</Typography>
+                  </Grid>
+                </Grid>
+              </ListItem>
+              <ListItem>
+                <Grid container>
+                  <Grid item xs={6}>
+                    <Typography>Shipping:</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography align="right">${shippingPrice}</Typography>
                   </Grid>
                 </Grid>
               </ListItem>
@@ -218,7 +217,7 @@ function PlaceOrder() {
                   </Grid>
                   <Grid item xs={6}>
                     <Typography align="right">
-                      <strong>$ {totalPrice}</strong>
+                      <strong>${totalPrice}</strong>
                     </Typography>
                   </Grid>
                 </Grid>
