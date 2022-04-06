@@ -225,7 +225,7 @@ export default function Shipping() {
               )}
             ></Controller>
           </ListItem>
-          <ListItem>
+          {/* <ListItem>
             <Button
               variant="contained"
               type="button"
@@ -237,7 +237,7 @@ export default function Shipping() {
             <Typography>
               {location.lat && `${location.lat}, ${location.lat}`}
             </Typography>
-          </ListItem>
+          </ListItem> */}
           <ListItem>
             <Button variant="contained" type="submit" fullWidth color="primary">
               Continue
