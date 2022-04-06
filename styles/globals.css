@@ -14,3 +14,207 @@ a {
 * {
   box-sizing: border-box;
 }
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+
+/*slider*/
+.slider {
+  position: relative;
+  /* height: 700px; */
+  height: calc(100vh - 100px);
+  background-color: #d1411e;
+  
+}
+.slide {
+  position: absolute;
+  top: 0;
+  /* left: 0; */
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+}
+.imgContainer{
+    margin-left: 30%;
+    width: 65vw;
+    height: 90%;
+    position: relative;
+}
+.slideContent{
+  position: relative;
+  z-index: 999;
+
+}
+.slide.current {
+  display: inline;
+  opacity: 1;
+}
+
+.ShopNow {
+  width: 190px;
+  align-items: center;
+  border: none;
+  background-color: #1e1e2c;
+  color: rgb(241, 241, 241);
+  border-radius: 30px;
+  font-size: 19px;
+  outline: none;
+  padding: 11px 0px;
+  transition: all ease-out 0.3s;
+}
+.ShopNow:hover {
+  color: #1e1e2c;
+  cursor: pointer;
+  background-color: #ebebeb;
+}
+.ShopNow::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  opacity: 0;
+  content: "";
+  transition: all ease 0.5s;
+}
+.ShopNow:hover::before {
+  transition: 0.5s all ease;
+  border-radius: 30px;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  z-index: -1;
+  box-shadow: 0 5px 5px -2px rgba(0, 0, 0, 0.5);
+}
+/*btns */
+.slide .content {
+  opacity: 0;
+  position: absolute;
+  left: -600px;
+  bottom: 70px;
+}
+.slide.current .content {
+  z-index: 1;
+  opacity: 1;
+  transform: translateX(700px);
+  transition: all 0.7s ease-in-out 0.3s;
+}
+
+.slide .titleslider {
+  opacity: 0;
+  position: absolute;
+  top: -700px;
+  left: 100px;
+  font-size: 70px;
+  font-weight: 700;
+}
+.slide .subtitleslider {
+  opacity: 0;
+  position: absolute;
+  top: -700px;
+  left: 100px;
+  font-size: 30px;
+  font-weight: 500;
+}
+.slide.current .titleslider {
+  opacity: 1;
+  transform: translateY(870px);
+  transition: all 0.7s ease-in-out 0.3s;
+}
+.slide.current .subtitleslider {
+  opacity: 1;
+  transform: translateY(970px);
+  transition: all 0.7s ease-in-out 0.3s;
+}
+.next {
+  position: absolute;
+  opacity: 0.5;
+  top: 50%;
+  right: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.prev {
+  position: absolute;
+  opacity: 0.5;
+  top: 50%;
+  left: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.next:hover,
+.prev:hover {
+  opacity: 1;
+  transform: scale(2.1);
+}
+
+
+/******************************MEDIA **********/
+
+@media screen and (max-width: 768px) {
+
+  .slider {
+    z-index: 0;
+    position: relative;
+  /* height: 700px; */
+  height: calc(60vh - 100px);
+  }
+
+  .slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+}
+
+  .imgContainer{
+    margin-top: 50px;
+    margin-left: 30%;
+    width: 70vw;
+    height: 60%;
+    position: relative;
+}
+
+  .slide .titleslider {
+    left: 10px;
+    text-align: center;
+  }
+
+  .slide.current .titleslider {
+    font-size: 28px;
+    transform: translateY(770px);
+  }
+
+  .slide.current .subtitleslider {
+    font-size: 18px;
+    left: 10px;
+    transform: translateY(830px);
+    top: -720px;
+    font-weight: 700;
+  }
+
+  .slide.current .content {
+    z-index: 1;
+    transform: translateX(840px);
+    /* bottom: 200px; */
+  }
+
+  .slide .content {
+  opacity: 0;
+  position: absolute;
+  left: -830px;
+  bottom: 70px;
+}
+
+.ShopNow{
+  width: 110px;
+  font-size: 13px;
+  font-weight: 700;
+}
+/* transform: scale(1.1); */
+}
+
